@@ -78,10 +78,13 @@ class Addition(Base):
 					with open(image_filename, 'wb') as file:
 						file.write(image_bytes)
 
-					path = os.getcwd() + '\\{}'.format(image_filename)
+					path = os.getcwd() + '/{}'.format(image_filename)
 					image_paths.append(path)
 
-				album_upload = inst_client.album_upload(paths=image_paths, caption=caption)
+				if len(image_paths) > 1:
+					album_upload = inst_client.album_upload(paths=image_paths, caption=caption)
+				else:
+					photo_upload = inst_client.photo_upload(paths=image_paths[0], caption=caption)
 				
 				delete_images = [os.remove(path) for path in image_paths]
 				delete_task = await self.__delete_task(tasks_id, image_filenames)
@@ -123,8 +126,10 @@ class Addition(Base):
 		response_json = {'status': 'error', 'err_description': None}
 
 		try:
-			now = datetime.now()
+			now = datetime.now() + timedelta(hours=3)
 			current_time = now.strftime("%d.%m.%Y, %H:%M")
+			logger.info(current_time)
+
 			minute_ago = (datetime.strptime(current_time, "%d.%m.%Y, %H:%M") - timedelta(minutes=1)).strftime("%d.%m.%Y, %H:%M")
 			all_tasks = await self.__tasks()
 			if all_tasks['status'] == 'error':
@@ -136,7 +141,7 @@ class Addition(Base):
 			if len(to_implementation) == 0:
 				response_json['err_description'] = 'There are no suitable tasks at this time.'
 				return response_json
-				
+
 			public_posts = await self.__public_posts(to_implementation)
 			if public_posts['status'] == 'error':
 				response_json['err_description'] = public_posts['err_description']
