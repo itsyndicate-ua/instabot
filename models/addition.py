@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from loguru import logger
-from datetime import datetime
+from datetime import datetime, timedelta
 from instagrapi import Client 
 import json
 import boto3
@@ -125,13 +125,18 @@ class Addition(Base):
 		try:
 			now = datetime.now()
 			current_time = now.strftime("%d.%m.%Y, %H:%M")
+			minute_ago = (datetime.strptime(current_time, "%d.%m.%Y, %H:%M") - timedelta(minutes=1)).strftime("%d.%m.%Y, %H:%M")
 			all_tasks = await self.__tasks()
 			if all_tasks['status'] == 'error':
 				response_json['err_description'] = all_tasks['err_description']
 				return response_json
 
 			tasks = all_tasks['tasks']
-			to_implementation = [task for task in tasks if task['date_time'] == current_time]
+			to_implementation = [task for task in tasks if task['date_time'] == current_time or task['date_time'] == minute_ago]
+			if len(to_implementation) == 0:
+				response_json['err_description'] = 'There are no suitable tasks at this time.'
+				return response_json
+				
 			public_posts = await self.__public_posts(to_implementation)
 			if public_posts['status'] == 'error':
 				response_json['err_description'] = public_posts['err_description']
