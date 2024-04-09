@@ -84,7 +84,7 @@ class Addition(Base):
 				if len(image_paths) > 1:
 					album_upload = inst_client.album_upload(paths=image_paths, caption=caption)
 				else:
-					photo_upload = inst_client.photo_upload(paths=image_paths[0], caption=caption)
+					photo_upload = inst_client.photo_upload(path=image_paths[0], caption=caption)
 				
 				delete_images = [os.remove(path) for path in image_paths]
 				delete_task = await self.__delete_task(tasks_id, image_filenames)
