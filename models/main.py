@@ -191,7 +191,7 @@ class Main(Base):
 			status = if_task_exists['status']
 			err_description = if_task_exists['err_description']
 			task = if_task_exists['task']
-			image_filenames = task['images']
+			image_filenames = task['images'] if len(task.keys()) > 0 else []
 
 			if status == 'error':
 				response_json['err_description'] = err_description
