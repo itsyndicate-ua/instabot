@@ -51,9 +51,10 @@ class Main(Base):
 
 					response_json['names'].append(filename)
 
-			if len(response_json['names']):
+			if len(response_json['names']) == 0:
 				response_json['response'] = 'The request was not completed because all the images did not fit the format. Acceptable formats: jpg, png.'
-
+				return response_json
+				
 			response_json['status'] = 'success'
 
 		except Exception as e:
